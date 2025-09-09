@@ -19,6 +19,11 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend-app.rule=Host(`triggerdev-trigger-somref-527b3e-4-155-36-74.traefik.me`)
+      - traefik.http.routers.frontend-app.entrypoints=web
+      - traefik.http.services.frontend-app.loadbalancer.server.port=3000
     ports:
     - target: 3000
       published: 8030
@@ -31,6 +36,7 @@ services:
     networks:
       - webapp
       - supervisor
+      - dokploy-network
     command: ./scripts/entrypoint.sh
     healthcheck:
       test: ["CMD", "node", "-e", "http.get('http://localhost:3000/healthcheck', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
@@ -373,5 +379,7 @@ networks:
     name: supervisor
   webapp:
     name: webapp
+  dokploy-network:
+      external: true
 
 
