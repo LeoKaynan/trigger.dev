@@ -25,7 +25,7 @@ services:
         - "traefik.http.routers.webapp.entrypoints=web,websecure"
         - "traefik.http.routers.webapp.tls=true"
         - "traefik.http.routers.webapp.tls.certresolver=letsencrypt"
-        - "traefik.http.services.webapp.loadbalancer.server.port=3000"
+        - "traefik.http.services.webapp.loadbalancer.server.port=8030"
     depends_on:
       - postgres
       - redis
