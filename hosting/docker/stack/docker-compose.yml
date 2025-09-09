@@ -25,11 +25,6 @@ services:
         - "traefik.http.routers.webapp.entrypoints=websecure"
         - "traefik.http.routers.webapp.tls.certresolver=letsencrypt"
         - "traefik.http.services.webapp.loadbalancer.server.port=3000"
-    ports:
-      - target: 3000
-        published: 8030
-        protocol: tcp
-        mode: ingress
     depends_on:
       - postgres
       - redis
@@ -45,9 +40,9 @@ services:
       retries: 5
       start_period: 10s
     environment:
-      APP_ORIGIN: ${APP_ORIGIN:-triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me}
-      LOGIN_ORIGIN: ${LOGIN_ORIGIN:-triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me}
-      API_ORIGIN: ${API_ORIGIN:-triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me}
+      APP_ORIGIN: ${APP_ORIGIN:-https://triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me}
+      LOGIN_ORIGIN: ${LOGIN_ORIGIN:-https://triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me}
+      API_ORIGIN: ${API_ORIGIN:-https://triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me}
       ELECTRIC_ORIGIN: http://electric:3000
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/main?schema=public&sslmode=disable}
       DIRECT_URL: ${DIRECT_URL:-postgresql://postgres:postgres@postgres:5432/main?schema=public&sslmode=disable}
@@ -59,7 +54,7 @@ services:
       REDIS_PORT: 6379
       REDIS_TLS_DISABLED: "true"
       APP_LOG_LEVEL: info
-      DEV_OTEL_EXPORTER_OTLP_ENDPOINT: ${DEV_OTEL_EXPORTER_OTLP_ENDPOINT:-triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me/otel}
+      DEV_OTEL_EXPORTER_OTLP_ENDPOINT: ${DEV_OTEL_EXPORTER_OTLP_ENDPOINT:-https://triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me/otel}
       DEPLOY_REGISTRY_HOST: ${DOCKER_REGISTRY_URL:-localhost:5000}
       DEPLOY_REGISTRY_NAMESPACE: ${DOCKER_REGISTRY_NAMESPACE:-trigger}
       OBJECT_STORE_BASE_URL: ${OBJECT_STORE_BASE_URL:-http://minio:9000}
@@ -372,15 +367,15 @@ volumes:
   minio:
 
 networks:
-  docker-proxy:
-    name: docker-proxy
+  webapp:
     driver: overlay
     attachable: true
   supervisor:
-    name: supervisor
     driver: overlay
     attachable: true
-  webapp:
-    name: webapp
+  docker-proxy:
     driver: overlay
     attachable: true
+  dokploy-traefik:
+    external: true
+
