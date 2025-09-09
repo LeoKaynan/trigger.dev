@@ -50,7 +50,7 @@ services:
       MANAGED_WORKER_SECRET: ${MANAGED_WORKER_SECRET}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_TLS_DISABLED: true
+      REDIS_TLS_DISABLED: "true"
       APP_LOG_LEVEL: info
       DEV_OTEL_EXPORTER_OTLP_ENDPOINT: ${DEV_OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:8030/otel}
       DEPLOY_REGISTRY_HOST: ${DOCKER_REGISTRY_URL:-localhost:5000}
@@ -145,8 +145,8 @@ services:
       - webapp
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/main?schema=public&sslmode=disable}
-      ELECTRIC_INSECURE: true
-      ELECTRIC_USAGE_REPORTING: false
+      ELECTRIC_INSECURE: "true"
+      ELECTRIC_USAGE_REPORTING: "false"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/v1/health"]
       interval: 10s
