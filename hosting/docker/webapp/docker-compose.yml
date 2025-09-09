@@ -10,6 +10,10 @@ x-logging: &logging-config
 services:
   webapp:
     image: ghcr.io/triggerdotdev/trigger.dev:${TRIGGER_IMAGE_TAG:-v4-beta}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     ports:
@@ -80,6 +84,10 @@ services:
 
   postgres:
     image: postgres:${POSTGRES_IMAGE_TAG:-14}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     ports:
@@ -104,6 +112,10 @@ services:
 
   redis:
     image: redis:${REDIS_IMAGE_TAG:-7}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     ports:
@@ -121,6 +133,10 @@ services:
 
   electric:
     image: electricsql/electric:${ELECTRIC_IMAGE_TAG:-1.0.24}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     depends_on:
@@ -140,6 +156,10 @@ services:
 
   clickhouse:
     image: bitnami/clickhouse:${CLICKHOUSE_IMAGE_TAG:-latest}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     ports:
@@ -162,6 +182,10 @@ services:
 
   registry:
     image: registry:${REGISTRY_IMAGE_TAG:-2}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     ports:
@@ -184,6 +208,10 @@ services:
 
   minio:
     image: bitnami/minio:${MINIO_IMAGE_TAG:-latest}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
     restart: ${RESTART_POLICY:-unless-stopped}
     logging: *logging-config
     ports:
