@@ -19,6 +19,11 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+    ports:
+    - target: 3000
+      published: 8030
+      protocol: tcp
+      mode: ingress
     depends_on:
       - postgres
       - redis
