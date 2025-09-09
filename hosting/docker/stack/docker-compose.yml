@@ -31,7 +31,6 @@ services:
     networks:
       - webapp
       - supervisor
-      - dokploy-network
     command: ./scripts/entrypoint.sh
     healthcheck:
       test: ["CMD", "node", "-e", "http.get('http://localhost:3000/healthcheck', res => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
@@ -377,6 +376,5 @@ networks:
   docker-proxy:
     driver: overlay
     attachable: true
-  dokploy-network:
-    external: true
+
 
