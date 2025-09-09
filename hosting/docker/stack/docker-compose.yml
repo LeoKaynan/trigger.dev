@@ -19,11 +19,11 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.webapp.rule=Host(`triggerdev-trigger-somref-527b3e-4-155-36-74.traefik.me`)
-      - traefik.http.routers.webapp.entrypoints=web
-      - traefik.http.services.webapp.loadbalancer.server.port=3000
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.webapp.rule=Host(`triggerdev-trigger-somref-527b3e-4-155-36-74.traefik.me`)
+        - traefik.http.routers.webapp.entrypoints=web
+        - traefik.http.services.webapp.loadbalancer.server.port=3000
     ports:
     - target: 3000
       published: 8030
