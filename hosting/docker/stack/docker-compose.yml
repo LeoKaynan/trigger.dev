@@ -300,14 +300,9 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-    secrets:
-      - source: worker_token
-        target: worker_token
-        mode: 0440
     environment:
       # This needs to match the token of the worker group you want to connect to
-      # TRIGGER_WORKER_TOKEN: ${TRIGGER_WORKER_TOKEN}
-      TRIGGER_WORKER_TOKEN: file:///run/secrets/worker_token
+      TRIGGER_WORKER_TOKEN: ${TRIGGER_WORKER_TOKEN}
       MANAGED_WORKER_SECRET: ${MANAGED_WORKER_SECRET}
       TRIGGER_API_URL: ${TRIGGER_API_URL:-http://webapp:3000}
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://webapp:3000/otel}
@@ -380,7 +375,3 @@ networks:
     name: webapp
     driver: overlay
     attachable: true
-
-secrets:
-  worker_token:
-    file: ./secrets/worker_token
