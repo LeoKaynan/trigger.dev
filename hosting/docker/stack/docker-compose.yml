@@ -1,0 +1,152 @@
+version: "3.9"
+
+x-logging: &logging-config
+  driver: ${LOGGING_DRIVER:-json-file}
+  options:
+    max-size: ${LOGGING_MAX_SIZE:-20m}
+    max-file: ${LOGGING_MAX_FILES:-5}
+    compress: ${LOGGING_COMPRESS:-true}
+
+services:
+  webapp:
+    image: ghcr.io/triggerdotdev/trigger.dev:${TRIGGER_IMAGE_TAG:-v4-beta}
+    ports:
+      - target: 3000
+        published: 8030
+        protocol: tcp
+        mode: ingress
+    networks:
+      - webapp
+      - supervisor
+    volumes:
+      - shared:/home/node/shared
+    command: sh -c "chown -R node:node /home/node/shared && exec ./scripts/entrypoint.sh"
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8030}
+      LOGIN_ORIGIN: ${LOGIN_ORIGIN:-http://localhost:8030}
+      API_ORIGIN: ${API_ORIGIN:-http://localhost:8030}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_HOST: redis
+    logging: *logging-config
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager   # roda no manager
+      restart_policy:
+        condition: on-failure
+
+  postgres:
+    image: postgres:${POSTGRES_IMAGE_TAG:-14}
+    networks:
+      - webapp
+    volumes:
+      - postgres:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    logging: *logging-config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis:
+    image: redis:${REDIS_IMAGE_TAG:-7}
+    networks:
+      - webapp
+    volumes:
+      - redis:/data
+    logging: *logging-config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  clickhouse:
+    image: bitnami/clickhouse:${CLICKHOUSE_IMAGE_TAG:-latest}
+    networks:
+      - webapp
+    volumes:
+      - clickhouse:/bitnami/clickhouse
+    logging: *logging-config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  minio:
+    image: bitnami/minio:${MINIO_IMAGE_TAG:-latest}
+    networks:
+      - webapp
+    volumes:
+      - minio:/bitnami/minio/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-very-safe-password}
+    logging: *logging-config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  registry:
+    image: registry:${REGISTRY_IMAGE_TAG:-2}
+    networks:
+      - webapp
+    volumes:
+      - ../registry/auth.htpasswd:/auth/htpasswd:ro
+    logging: *logging-config
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  supervisor:
+    image: ghcr.io/triggerdotdev/supervisor:${TRIGGER_IMAGE_TAG:-v4-beta}
+    networks:
+      - supervisor
+      - docker-proxy
+      - webapp
+    volumes:
+      - shared:/home/node/shared
+    command: sh -c "chown -R node:node /home/node/shared && exec /usr/bin/dumb-init -- pnpm run --filter supervisor start"
+    environment:
+      TRIGGER_WORKER_TOKEN: file:///home/node/shared/worker_token
+      MANAGED_WORKER_SECRET: ${MANAGED_WORKER_SECRET}
+      TRIGGER_API_URL: http://webapp:3000
+    logging: *logging-config
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == worker   # força rodar em um worker
+      restart_policy:
+        condition: on-failure
+
+  docker-proxy:
+    image: tecnativa/docker-socket-proxy:${DOCKER_PROXY_IMAGE_TAG:-latest}
+    networks:
+      - docker-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    logging: *logging-config
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker   # acompanha o supervisor no worker
+
+volumes:
+  clickhouse:
+  postgres:
+  redis:
+  shared:
+  minio:
+
+networks:
+  webapp:
+    driver: overlay
+  supervisor:
+    driver: overlay
+  docker-proxy:
+    driver: overlay
