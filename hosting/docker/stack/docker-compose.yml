@@ -153,7 +153,6 @@ services:
     logging: *logging-config
     depends_on:
       - postgres
-      - dokploy-traefik
     networks:
       - webapp
     deploy:
@@ -207,7 +206,6 @@ services:
       - ../clickhouse/override.xml:/bitnami/clickhouse/etc/config.d/override.xml:ro
     networks:
       - webapp
-      - dokploy-traefik
     healthcheck:
       test: ["CMD", "clickhouse-client", "--host", "localhost", "--port", "9000", "--user", "${CLICKHOUSE_USER:-default}", "--password", "${CLICKHOUSE_PASSWORD:-password}", "--query", "SELECT 1"]
       interval: 5s
@@ -235,7 +233,6 @@ services:
         mode: ingress
     networks:
       - webapp
-      - dokploy-traefik
     volumes:
       # registry-user:very-secure-indeed
       - ../registry/auth.htpasswd:/auth/htpasswd:ro
@@ -274,7 +271,6 @@ services:
         mode: ingress
     networks:
       - webapp
-      - dokploy-traefik
     volumes:
       - minio:/bitnami/minio/data
     environment:
@@ -298,7 +294,6 @@ services:
       - supervisor
       - docker-proxy
       - webapp
-      - dokploy-traefik
     command: /usr/bin/dumb-init -- pnpm run --filter supervisor start
     deploy:
       replicas: 4
