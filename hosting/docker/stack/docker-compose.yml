@@ -367,14 +367,11 @@ volumes:
 
 
 networks:
-  webapp:
-    driver: overlay
-    attachable: true
-  supervisor:
-    driver: overlay
-    attachable: true
   docker-proxy:
-    driver: overlay
-    attachable: true
+    name: docker-proxy
+  supervisor:
+    name: supervisor
+  webapp:
+    name: webapp
 
 
