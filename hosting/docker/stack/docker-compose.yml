@@ -22,7 +22,8 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.webapp.rule=Host(`triggerdev-trigger-kfcf01-8acd41-4-155-36-74.traefik.me`)"
-        - "traefik.http.routers.webapp.entrypoints=websecure"
+        - "traefik.http.routers.webapp.entrypoints=web,websecure"
+        - "traefik.http.routers.webapp.tls=true"
         - "traefik.http.routers.webapp.tls.certresolver=letsencrypt"
         - "traefik.http.services.webapp.loadbalancer.server.port=3000"
     depends_on:
